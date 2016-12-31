@@ -1,0 +1,9 @@
+#!/bin/sh
+
+VER=$(make -V PORTVERSION)
+PORTNAME=${PWD#*default/}
+
+svn diff
+echo -e psvn ci -m "\"\e[96m${PORTNAME}: update to ${VER}\e[0m\"" 
+sleep 5
+psvn ci -m "${PORTNAME}: update to ${VER}"

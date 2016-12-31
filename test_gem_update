@@ -1,0 +1,9 @@
+#!/bin/sh
+
+#tb
+#if [ $? -ne 0 ]; then
+#  exit 1
+#fi
+TMPFILE=$(mktemp)
+index_grep > ${TMPFILE}
+sudo poudriere bulk -j 110-amd64 -f ${TMPFILE}

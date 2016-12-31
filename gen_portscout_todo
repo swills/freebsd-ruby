@@ -1,0 +1,18 @@
+#!/bin/sh
+
+PORTSDIR=/usr/ports
+MAINTAINER=ruby@freebsd.org
+
+LINES=$(  fetch -q -o- "https://portscout.freebsd.org/rss/rss.cgi?m=${MAINTAINER}" | \
+		xml sel -t -m "//rss/channel/item" -v "port:portcat" -o '/' -v "port:portname" -o ',' -v 'port:version' -o ',' -v 'port:newversion' -n | \
+		sort
+      )
+
+for LINE in ${LINES} ; do
+  PORT=$(echo ${LINE} | cut -d, -f 1)
+  if [ $(make -C ${PORTSDIR}/${PORT} -V DEPRECATED | wc -c | xargs) -le 1 ]; then
+    # not deprecated, print it
+    echo ${LINE}
+  fi 
+
+done

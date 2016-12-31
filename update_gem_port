@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# define a bunch of variables and try to find latest version
+GEM=$(make -V GEM_NAME | sed -e 's/-[0123456789].*//')
+CURVER=$(make -V GEM_NAME).gem
+NEWVER=$(gem search ${GEM} | grep "^${GEM} " | cut -d\( -f 2 | cut -d\) -f 1 | cut -d, -f 1 | awk '{print $1}')
+
+# nothing to do
+if [ "${CURVER}" == "${NEWVER}" ] ; then
+  exit 0
+fi
+
+sed -i '' "s/PORTVERSION=.*/PORTVERSION=	${NEWVER}/" Makefile
+sed -i '' "/PORTREVISION.*/d" Makefile
+
+sudo make makesum
+sudo make clean
+svn diff

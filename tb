@@ -1,0 +1,47 @@
+#!/bin/sh
+
+#PORTDIR=$1
+
+PORTDIR=${PWD#*default/}
+
+#CLOCK="date +%s"
+CLOCK=/usr/local/libexec/poudriere/clock_monotonic
+
+START_TIME=$(${CLOCK})
+
+#JAILS=$(poudriere jail -lq | awk '{print $1}')
+#JAILS="head-amd64 head-i386 110-amd64 110-i386 103-amd64 103-i386 102-amd64 102-i386 101-amd64 101-i386 93-amd64 93-i386 head-armv6 head-mips"
+JAILS="head-amd64 head-i386 110-amd64 110-i386 103-amd64 103-i386 102-amd64 102-i386 101-amd64 101-i386 93-amd64 93-i386"
+#JAILS="110-amd64 110-i386 103-amd64 103-i386 102-amd64 102-i386 101-amd64 101-i386 93-amd64 93-i386"
+
+elapsed_time () {
+
+  END_TIME=$(${CLOCK})
+  
+  _elapsed=$((${END_TIME} - ${START_TIME}))
+  
+  seconds=$((${_elapsed} % 60))
+  minutes=$(((${_elapsed} / 60) % 60))
+  hours=$((${_elapsed} / 3600))
+  
+  _duration=$(printf "%02d:%02d:%02d" ${hours} ${minutes} ${seconds})
+  
+  echo "Elapsed time: ${_duration}"
+
+}
+
+for x in ${JAILS} ; do
+  sudo nice -n 18 /usr/sbin/idprio 29 poudriere bulk -C -t -j ${x} ${PORTDIR}
+  if [ $? -ne 0 ]; then
+    echo -e "\033[31m" ; figlet -f sblood FAIL ; echo -e "\e[0m"
+    echo ""
+    elapsed_time
+    exit 1
+  fi
+done
+
+figlet Success\! | cowsay -n | lolcat -p 1; echo ""
+
+elapsed_time
+
+exit 0
