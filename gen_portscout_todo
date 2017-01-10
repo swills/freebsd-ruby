@@ -10,9 +10,88 @@ LINES=$(  fetch -q -o- "https://portscout.freebsd.org/rss/rss.cgi?m=${MAINTAINER
 
 for LINE in ${LINES} ; do
   PORT=$(echo ${LINE} | cut -d, -f 1)
-  if [ $(make -C ${PORTSDIR}/${PORT} -V DEPRECATED | wc -c | xargs) -le 1 ]; then
-    # not deprecated, print it
-    echo ${LINE}
-  fi 
+
+  OLDMAJOR=$(echo ${LINE} | cut -d, -f 2 | cut -d\. -f 1)
+  NEWMAJOR=$(echo ${LINE} | cut -d, -f 3 | cut -d\. -f 1)
+  OLDMINOR=$(echo ${LINE} | cut -d, -f 2 | cut -d\. -f 2)
+  NEWMINOR=$(echo ${LINE} | cut -d, -f 3 | cut -d\. -f 2)
+  OLDMICRO=$(echo ${LINE} | cut -d, -f 2 | cut -d\. -f 3)
+  NEWMICRO=$(echo ${LINE} | cut -d, -f 3 | cut -d\. -f 3)
+
+  if [ "${OLDMAJOR}" = "" ]; then OLDMAJOR=0 ; fi
+  if [ "${NEWMAJOR}" = "" ]; then NEWMAJOR=0 ; fi
+  if [ "${OLDMINOR}" = "" ]; then OLDMINOR=0 ; fi
+  if [ "${NEWMINOR}" = "" ]; then NEWMINOR=0 ; fi
+  if [ "${OLDMICRO}" = "" ]; then OLDMICRO=0 ; fi
+  if [ "${NEWMICRO}" = "" ]; then NEWMICRO=0 ; fi
+
+  if [ ${OLDMAJOR} = ${NEWMAJOR} -a ${OLDMINOR} = ${NEWMINOR} -a ${OLDMICRO} = ${NEWMICRO} ]; then
+    if [ $(make -C ${PORTSDIR}/${PORT} -V DEPRECATED | wc -c | xargs) -le 1 ]; then
+      # not deprecated, print it
+      echo ${LINE}
+    fi
+  fi
+
+done
+
+for LINE in ${LINES} ; do
+  PORT=$(echo ${LINE} | cut -d, -f 1)
+
+  OLDMAJOR=$(echo ${LINE} | cut -d, -f 2 | cut -d\. -f 1)
+  NEWMAJOR=$(echo ${LINE} | cut -d, -f 3 | cut -d\. -f 1)
+  OLDMINOR=$(echo ${LINE} | cut -d, -f 2 | cut -d\. -f 2)
+  NEWMINOR=$(echo ${LINE} | cut -d, -f 3 | cut -d\. -f 2)
+
+  if [ "${OLDMAJOR}" = "" ]; then OLDMAJOR=0 ; fi
+  if [ "${NEWMAJOR}" = "" ]; then NEWMAJOR=0 ; fi
+  if [ "${OLDMINOR}" = "" ]; then OLDMINOR=0 ; fi
+  if [ "${NEWMINOR}" = "" ]; then NEWMINOR=0 ; fi
+
+  if [ ${OLDMAJOR} = ${NEWMAJOR} -a ${OLDMINOR} = ${NEWMINOR} ]; then
+    if [ ${OLDMICRO} != ${NEWMICRO} ]; then
+      if [ $(make -C ${PORTSDIR}/${PORT} -V DEPRECATED | wc -c | xargs) -le 1 ]; then
+        # not deprecated, print it
+        echo ${LINE}
+      fi
+    fi
+  fi
+
+done
+
+for LINE in ${LINES} ; do
+  PORT=$(echo ${LINE} | cut -d, -f 1)
+
+  OLDMAJOR=$(echo ${LINE} | cut -d, -f 2 | cut -d\. -f 1)
+  NEWMAJOR=$(echo ${LINE} | cut -d, -f 3 | cut -d\. -f 1)
+
+  if [ "${OLDMAJOR}" = "" ]; then OLDMAJOR=0 ; fi
+  if [ "${NEWMAJOR}" = "" ]; then NEWMAJOR=0 ; fi
+
+  if [ ${OLDMAJOR} = ${NEWMAJOR} ]; then
+    if [ ${OLDMINOR} != ${NEWMINOR} ]; then
+      if [ $(make -C ${PORTSDIR}/${PORT} -V DEPRECATED | wc -c | xargs) -le 1 ]; then
+        # not deprecated, print it
+        echo ${LINE}
+      fi
+    fi
+  fi
+
+done
+
+for LINE in ${LINES} ; do
+  PORT=$(echo ${LINE} | cut -d, -f 1)
+
+  OLDMAJOR=$(echo ${LINE} | cut -d, -f 2 | cut -d\. -f 1)
+  NEWMAJOR=$(echo ${LINE} | cut -d, -f 3 | cut -d\. -f 1)
+
+  if [ "${OLDMAJOR}" = "" ]; then OLDMAJOR=0 ; fi
+  if [ "${NEWMAJOR}" = "" ]; then NEWMAJOR=0 ; fi
+
+  if [ ${OLDMAJOR} != ${NEWMAJOR} ]; then
+    if [ $(make -C ${PORTSDIR}/${PORT} -V DEPRECATED | wc -c | xargs) -le 1 ]; then
+      # not deprecated, print it
+      echo ${LINE}
+    fi
+  fi
 
 done
