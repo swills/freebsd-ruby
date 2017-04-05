@@ -102,7 +102,7 @@ File.open('Makefile', 'w') do |f|
         else
             f.print "\t\t"
         end
-        f.puts "rubygem-#{d.name}>=#{version}:${PORTSDIR}/CATEGORY/rubygem-#{d.name}"
+        f.puts "rubygem-#{d.name}>=#{version}:CATEGORY/rubygem-#{d.name}"
     end
     f.puts "USE_RUBY=\tyes"
     f.puts "USES=\t\tgem"
