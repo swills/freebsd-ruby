@@ -102,8 +102,15 @@ File.open('Makefile', 'w') do |f|
         else
             f.print "\t\t"
         end
-        f.puts "rubygem-#{d.name}>=#{version}:CATEGORY/rubygem-#{d.name}"
+        f.print "rubygem-#{d.name}>=#{version}:CATEGORY/rubygem-#{d.name}"
+        if d != s.dependencies.last
+            f.puts " \\"
+	else
+            f.puts ""
+        end
+
     end
+    f.puts ""
     f.puts "USE_RUBY=\tyes"
     f.puts "USES=\t\tgem"
     f.puts
